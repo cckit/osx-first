@@ -2,8 +2,12 @@
 
 # Uninstall existing Homebrew
 function removeHomebrew() {
-    ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/uninstall)" -- -f -q || exit $?
-    which -s brew && echo 'Pre-installed Homebrew still exists...' && exit 1 || (echo 'Pre-installed Homebrew uninstalled!' && exit 0)
+    if [[ ! $DEBUG ]]; then
+        ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/uninstall)" -- -f -q || exit $?
+        (which -s brew && echo 'Pre-installed Homebrew still exists...' && exit 1) || (echo 'Pre-installed Homebrew uninstalled!' && exit 0)
+    else
+        ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/uninstall)" -- --dry-run -f -q || exit $?
+    fi
 }
 
 function installHomebrewAndCask() {
@@ -14,6 +18,15 @@ function installHomebrewAndCask() {
 
     # Set application symlinks to /Applications
     (echo && echo 'export HOMEBREW_CASK_OPTS="--appdir=/Applications"') >> ~/.bash_profile
+
+    if [ $DEBUG ]; then
+        # List applications
+        echo ${apps[@]}
+    fi
 }
 
-installHomebrewAndCask
+apps=(/Applications/*.app)
+
+removeHomebrew && installHomebrewAndCask
+
+echo ${apps[@]}
