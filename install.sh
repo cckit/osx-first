@@ -2,19 +2,12 @@
 
 # Uninstall existing Homebrew
 function removeHomebrew() {
-    ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/uninstall)"
-    which -s brew
-
-    if [ $? -ne 0 ]; then
-        echo 'Pre-installed Homebrew uninstalled!'
-    else
-        echo 'Pre-installed Homebrew still exists...'
-        exit 1
-    fi
+    ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/uninstall)" -- --dry-run -f -q || exit $?
+    which -s brew && echo 'Pre-installed Homebrew still exists...' && exit 1 || (echo 'Pre-installed Homebrew uninstalled!' && exit 0)
 }
 
 function installTools() {
-    ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
+    ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     brew install caskroom/cask/brew-cask
 }
 
