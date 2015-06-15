@@ -2,7 +2,7 @@
 
 # Uninstall existing Homebrew
 function removeHomebrew() {
-    ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/uninstall)" -- --dry-run -f -q || exit $?
+    ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/uninstall)" -- -f -q || exit $?
     which -s brew && echo 'Pre-installed Homebrew still exists...' && exit 1 || (echo 'Pre-installed Homebrew uninstalled!' && exit 0)
 }
 
