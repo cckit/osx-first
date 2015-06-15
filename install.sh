@@ -28,5 +28,8 @@ function installHomebrewAndCask() {
 apps=(/Applications/*.app)
 
 removeHomebrew && installHomebrewAndCask
-
+brew install coreutils
+sudo su
+cd /
+gdu -h
 echo ${apps[@]}
