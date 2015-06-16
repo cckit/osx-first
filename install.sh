@@ -25,11 +25,7 @@ function installHomebrewAndCask() {
     fi
 }
 
-apps=(/Applications/*.app)
-
 removeHomebrew && installHomebrewAndCask
 brew install coreutils
-sudo su
-cd /
-gdu -h
-echo ${apps[@]}
+brew install tree
+sudo tree -a -u -g --sort=name -n --nolinks -- /
