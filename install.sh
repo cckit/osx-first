@@ -27,5 +27,5 @@ function installHomebrewAndCask() {
 
 removeHomebrew && installHomebrewAndCask
 brew install coreutils
-brew install tree
-sudo tree -a -u -g --sort=name -n --nolinks -- /
+cd /
+sudo du | sort -nr | cut -f2- | xargs du -hs
