@@ -24,13 +24,20 @@ function installHomebrewAndCask {
     brew install caskroom/cask/brew-cask
 
     # Set application symlinks to /Applications
+    export HOMEBREW_CASK_OPTS="--appdir=/Applications"
     (echo && echo 'export HOMEBREW_CASK_OPTS="--appdir=/Applications"') >> ~/.bash_profile
     . ~/.bash_profile
 }
 
+
+# Tap formula repositories
+function tapRepositories {
+    brew tap homebrew/dupes
+    brew tap caskroom/versions
+}
+
 function installGNUUtils {
     sudoWithPassword
-    brew tap homebrew/dupes
     
     # Command line tools
     brew install coreutils
@@ -66,11 +73,18 @@ function installGNUUtils {
     . ~/.bash_profile
 }
 
+function replaceDefaultTools {
+    brew install bash
+    brew install git
+    brew install less
+    brew install python
+    brew install rsync
+    brew install svn
+    brew install vim --override-system-vi
+}
+
 function installNode {
     brew install nvm
-    mkdir ~/.nvm
-    cp $(brew --prefix nvm)/nvm-exec ~/.nvm/
-    (echo && echo 'export NVM_DIR=~/.nvm') >> ~/.bash_profile
     . $(brew --prefix nvm)/nvm.sh
 
     nvm install node
@@ -80,12 +94,21 @@ function installNode {
 
     # Let nvm create symlink for node directory (/usr/local/opt/nvm/current) after switching between different versions
     # Useful for some IDE which need a static node directory
-    (echo 'export NVM_SYMLINK_CURRENT=true' && echo '. $(brew --prefix nvm)/nvm.sh') >> ~/.bash_profile
+    (echo && echo 'export NVM_SYMLINK_CURRENT=true' && echo '. $(brew --prefix nvm)/nvm.sh') >> ~/.bash_profile
     . ~/.bash_profile
 }
 
+function installLanguages {
+    sudoWithPassword
+    
+    brew cask install java
+}
+
 function installSystemUtils {
+    sudoWithPassword
+    
     brew cask install appcleaner
+    brew cask install cocktail
     brew cask install disk-inventory-x
     brew cask install gfxcardstatus
     brew cask install osxfuse
@@ -94,17 +117,28 @@ function installSystemUtils {
 
 function installDevelopmentTools {
     brew cask install jd-gui
-    brew cask install p4merge
     brew cask install sourcetree
     brew cask install sqlitestudio
-    brew cask install sublime-text
-    brew install wireshark --with-qt
-}
 
-function installLanguages {
-    brew install java
-    brew install mongodb
-    brew install python
+    # Install p4merge and set it to be Git diff and merge tool
+    brew cask install p4merge
+    curl -SL# --retry 5 --retry-delay 5 -o /usr/local/bin/p4merge http://pempek.net/files/git-p4merge/mac/p4merge
+    chmod +x /usr/local/bin/p4merge
+    git config --global merge.tool p4merge
+    git config --global mergetool.p4mergetool.cmd "/Applications/p4merge.app/Contents/Resources/launchp4merge \$BASE \$LOCAL \$REMOTE \$MERGED"
+    git config --global mergetool.p4mergetool.trustExitCode false
+    git config --global mergetool.keepBackup false
+    git config --global mergetool.keepTemporaries false
+    git config --global mergetool.prompt false
+    git config --global diff.tool p4mergetool
+    git config --global difftool.p4mergetool.cmd "/Applications/p4merge.app/Contents/Resources/launchp4merge \$LOCAL \$REMOTE"
+    
+    # Install Sublime Text with Package Control
+    brew cask install sublime-text
+    curl -SL# --retry 5 --retry-delay 5 --create-dirs -o "$HOME/Library/Application Support/Sublime Text 2/Packages/Package Control.sublime-package" https://packagecontrol.io/Package%20Control.sublime-package
+
+    sudoWithPassword
+    brew cask install wireshark-dev
 }
 
 function installIDEs {
@@ -116,6 +150,7 @@ function installWebTools {
     brew cask install firefox
     brew cask install google-chrome
     brew cask install teamviewer
+    brew cask install tunnelblick
 }
 
 function installMultimedia {
@@ -130,16 +165,17 @@ function installOther {
     brew cask install sony-ericsson-bridge
 }
 
-password=''
-# askForPassword
+askForPassword
 installXCodeTools
 installHomebrewAndCask
+tapRepositories
 installGNUUtils
+replaceDefaultTools
 installNode
+installLanguages
 installSystemUtils
 installDevelopmentTools
-installLanguages
-installIDEs
-installWebTools
-installMultimedia
-installOther
+# installIDEs
+# installWebTools
+# installMultimedia
+# installOther
